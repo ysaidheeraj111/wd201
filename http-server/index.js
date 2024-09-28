@@ -8,7 +8,14 @@ const PORT = minimist(process.argv.slice(2)).port || 3000; // Default port 3000
 // Serve static files (like HTML, CSS, JS)
 app.use(express.static('http-server'));
 
-// Your existing routes can go here
+// Route for registration page
+app.get('/registration', (req, res) => {
+    res.sendFile(path.join(__dirname, 'registration.html'));
+});
+
+app.listen(PORT, () => {
+    console.log(`Server is running on http://localhost:${PORT}`);
+});
 
 
 
