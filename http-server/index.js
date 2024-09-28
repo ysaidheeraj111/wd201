@@ -1,3 +1,17 @@
+const express = require('express');
+const path = require('path');
+const minimist = require('minimist');
+
+const app = express();
+const PORT = minimist(process.argv.slice(2)).port || 3000; // Default port 3000
+
+// Serve static files (like HTML, CSS, JS)
+app.use(express.static('http-server'));
+
+// Your existing routes can go here
+
+
+
 const http = require('http');
 const fs = require('fs');
 const minimist = require('minimist');
