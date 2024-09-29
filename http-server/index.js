@@ -1,68 +1,38 @@
-const express = require('express');
+const http = require('http');
+const fs = require('fs');
 const path = require('path');
 const minimist = require('minimist');
 
-const app = express();
-const PORT = minimist(process.argv.slice(2)).port || 3000; // Default port 3000
+const args = minimist(process.argv.slice(2)); // Parse port number
 
-// Serve static files (like HTML, CSS, JS)
-app.use(express.static('http-server'));
+const port = args.port || 3000; // Default to port 3000 if no port is provided
 
-// Route for registration page
-app.get('/registration', (req, res) => {
-    res.sendFile(path.join(__dirname, 'registration.html'));
-});
-
-app.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`);
-});
-
-
-
-const http = require('http');
-const fs = require('fs');
-const minimist = require('minimist');
-
-// Parse the command line arguments for the port number
-const args = minimist(process.argv.slice(2));
-const port = args.port || 3000;  // Default port is 3000 if none is provided
-
-http.createServer((req, res) => {
-    if (req.url === '/') {
-        fs.readFile('home.html', (err, data) => {
-            if (err) {
-                res.writeHead(500);
-                res.end('Error loading home.html');
-            } else {
-                res.writeHead(200, { 'Content-Type': 'text/html' });
-                res.end(data);
-            }
-        });
-    } else if (req.url === '/projects') {
-        fs.readFile('project.html', (err, data) => {
-            if (err) {
-                res.writeHead(500);
-                res.end('Error loading project.html');
-            } else {
-                res.writeHead(200, { 'Content-Type': 'text/html' });
-                res.end(data);
-            }
-        });
+const server = http.createServer((req, res) => {
+    if (req.url === '/' || req.url === '/home') {
+        serveFile(res, 'home.html', 'text/html');
+    } else if (req.url === '/project') {
+        serveFile(res, 'project.html', 'text/html');
     } else if (req.url === '/registration') {
-        fs.readFile('registration.html', (err, data) => {
-            if (err) {
-                res.writeHead(500);
-                res.end('Error loading registration.html');
-            } else {
-                res.writeHead(200, { 'Content-Type': 'text/html' });
-                res.end(data);
-            }
-        });
+        serveFile(res, 'registration.html', 'text/html');
     } else {
-        res.writeHead(404);
-        res.end('Page not found');
+        res.writeHead(404, { 'Content-Type': 'text/plain' });
+        res.end('404 Not Found');
     }
-}).listen(port, () => {
-    console.log(`Server running on port ${port}`);
 });
 
+function serveFile(res, filePath, contentType) {
+    const fullPath = path.join(__dirname, filePath);
+    fs.readFile(fullPath, (err, content) => {
+        if (err) {
+            res.writeHead(500, { 'Content-Type': 'text/plain' });
+            res.end('Server Error');
+        } else {
+            res.writeHead(200, { 'Content-Type': contentType });
+            res.end(content);
+        }
+    });
+}
+
+server.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
