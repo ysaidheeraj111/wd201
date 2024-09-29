@@ -3,9 +3,8 @@ const fs = require('fs');
 const path = require('path');
 const minimist = require('minimist');
 
-const args = minimist(process.argv.slice(2)); // Parse port number
-
-const port = args.port || 3000; // Default to port 3000 if no port is provided
+const args = minimist(process.argv.slice(2));
+const port = args.port || 3000;
 
 const server = http.createServer((req, res) => {
     if (req.url === '/' || req.url === '/home') {
